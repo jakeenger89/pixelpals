@@ -1,36 +1,58 @@
 import { useEffect, useState } from "react";
-import Construct from "./Construct.js";
-import ErrorNotification from "./ErrorNotification";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+// import AuthenticatedRoute from "./authentication";
+import Account from "./account";
+import SignUpForm from "./SignUpForm";
+import LoginForm from "./LoginForm";
 import "./App.css";
+// import Nav from "./Nav";
+// import AccountForm from "./LoginForm";
 
 function App() {
-  const [launchInfo, setLaunchInfo] = useState([]);
-  const [error, setError] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    Boolean(localStorage.getItem("yourAuthToken"))
+  );
 
   useEffect(() => {
-    async function getData() {
-      let url = `${process.env.REACT_APP_API_HOST}/api/launch-details`;
-      console.log("fastapi url: ", url);
-      let response = await fetch(url);
-      console.log("------- hello? -------");
-      let data = await response.json();
-
-      if (response.ok) {
-        console.log("got launch data!");
-        setLaunchInfo(data.launch_details);
-      } else {
-        console.log("drat! something happened");
-        setError(data.message);
-      }
+    const storedToken = localStorage.getItem("yourAuthToken");
+    if (storedToken) {
+      // You may want to validate the token on the server side as well
+      setIsAuthenticated(true);
     }
-    getData();
   }, []);
 
+  const domain = /https:\/\/[^/]+/;
+  const basename = process.env.PUBLIC_URL.replace(domain, "");
   return (
-    <div>
-      <ErrorNotification error={error} />
-      <Construct info={launchInfo} />
-    </div>
+    <BrowserRouter basename={basename}>
+      {/* <Nav isAuthenticated={isAuthenticated} /> */}
+      <div className="container">
+        <Routes>
+          <Route
+            index
+            path="/"
+            element={isAuthenticated ? <Account /> : <LoginForm />}
+          />
+          <Route path="account/:account_id" element={<Account />} />
+          <Route
+            index
+            path="account/*"
+            element={
+              <Account
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route index path="signupform" element={<SignUpForm />} />
+          <Route
+            index
+            path="loginform"
+            element={<LoginForm setIsAuthenticated={setIsAuthenticated} />}
+          />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

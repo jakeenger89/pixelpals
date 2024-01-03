@@ -9,7 +9,7 @@ import {
   MDBBtn,
 } from "mdb-react-ui-kit";
 
-const AccountForm = ({ setIsAuthenticated, setUserId }) => {
+const LoginForm = ({ setIsAuthenticated, setUserId }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -89,4 +89,4 @@ const AccountForm = ({ setIsAuthenticated, setUserId }) => {
   );
 };
 
-export default AccountForm;
+export default LoginForm;
