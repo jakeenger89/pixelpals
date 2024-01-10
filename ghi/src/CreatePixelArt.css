@@ -1,0 +1,18 @@
+.pixel-grid {
+  display: grid;
+  gap: 2px; /* Adjust the gap between cells as needed */
+  max-width: 400px; /* Set a maximum width for the grid */
+  margin: 0 auto; /* Center the grid on the page */
+}
+
+.pixel {
+  width: 100%;
+  padding-bottom: 100%; /* Maintain a 1:1 aspect ratio for each pixel */
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC; /* Add border for grid lines */
+}
+
+/* Add styles for hover or other interactions if needed */
+.pixel:hover {
+  background-color: #000000;
+}

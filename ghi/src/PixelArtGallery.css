@@ -1,0 +1,31 @@
+.new-pixel-art-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Adjust the horizontal gap between pixel art items */
+  max-width: 800px; /* Set a maximum width for the grid */
+  margin: 10px auto; /* Center the grid on the page with reduced margin */
+  justify-content: space-between; /* Distribute items along the main axis with maximum space between them */
+  align-items: flex-start; /* Align items at the start of the cross axis */
+}
+
+.new-pixel-art-item {
+  width: calc(50% - 5px); /* Adjust the width of each item to create a two-column layout with reduced width and gap */
+  box-sizing: border-box; /* Include padding and border in the width calculation */
+}
+
+.new-pixel-grid {
+  display: grid;
+  gap: 2px;
+  grid-template-columns: repeat(16, 1fr); /* Adjust the number of columns based on your grid size */
+}
+
+.new-pixel {
+  width: 100%;
+  padding-bottom: 100%;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+}
+
+.new-pixel:hover {
+  background-color: #000000;
+}

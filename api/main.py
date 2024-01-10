@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from routers.authenticator import authenticator
+from routers.pixel import router as pixel_router
 from routers import accounts
 
 app = FastAPI()
@@ -31,4 +32,5 @@ def launch_details():
     }
 
 
+app.include_router(pixel_router)
 app.include_router(accounts.router, prefix="", tags=["accounts"])

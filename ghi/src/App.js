@@ -4,9 +4,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Account from "./account";
 import SignUpForm from "./SignUpForm";
 import LoginForm from "./LoginForm";
+import CreatePixelArt from "./CreatePixelArt";
+import PixelArtGallery from "./PixelArtGallery";
 import "./App.css";
-// import Nav from "./Nav";
-// import AccountForm from "./LoginForm";
+import Nav from "./Nav";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -25,7 +26,7 @@ function App() {
   const basename = process.env.PUBLIC_URL.replace(domain, "");
   return (
     <BrowserRouter basename={basename}>
-      {/* <Nav isAuthenticated={isAuthenticated} /> */}
+      <Nav isAuthenticated={isAuthenticated} />
       <div className="container">
         <Routes>
           <Route
@@ -33,7 +34,15 @@ function App() {
             path="/"
             element={isAuthenticated ? <Account /> : <LoginForm />}
           />
+          <Route
+          index
+          path="/"
+          element={isAuthenticated ? <Account /> : <LoginForm />}
+          />
+          <Route path="/createpixelart" element={<CreatePixelArt />}
+          />
           <Route path="account/:account_id" element={<Account />} />
+          <Route path="/pixelartgallery" element={<PixelArtGallery />} />
           <Route
             index
             path="account/*"

@@ -17,4 +17,19 @@ steps = [
         DROP TABLE IF EXISTS account;
         """
     ],
+    [
+        """
+        CREATE TABLE pixel_art (
+            art_id SERIAL PRIMARY KEY NOT NULL,
+            account_id INTEGER REFERENCES account(account_id) ON DELETE CASCADE,
+            pixel_data TEXT[][] NOT NULL,
+            name TEXT NOT NULL,
+            size VARCHAR(5) CHECK (size IN ('16x16', '32x32', '64x64')),
+            creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """,
+        """
+        DROP TABLE IF EXISTS pixel_art;
+        """
+    ],
 ]
