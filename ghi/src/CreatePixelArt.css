@@ -1,15 +1,31 @@
 .pixel-grid {
   display: grid;
   gap: 2px; /* Adjust the gap between cells as needed */
-  max-width: 400px; /* Set a maximum width for the grid */
+  max-width: 400px; /* Set a maximum width for the default grid */
   margin: 0 auto; /* Center the grid on the page */
 }
 
-.pixel {
+.pixel-grid-32 {
+  display: grid;
+  gap: 2px;
+  grid-template-columns: repeat(32, 20px); /* Adjust the size of each cell for 32x32 */
+  max-width: 800px; /* Set a maximum width for the 32x32 grid */
+  margin: 10px auto; /* Center the 32x32 grid on the page with some margin */
+}
+
+.pixel-grid-64 {
+  display: grid;
+  gap: 2px;
+  grid-template-columns: repeat(64, 10px); /* Adjust the size of each cell for 64x64 */
+  max-width: 800px; /* Set a maximum width for the 64x64 grid */
+  margin: 0 auto; /* Center the 64x64 grid on the page with no margin */
+}
+
+.pixels {
   width: 100%;
   padding-bottom: 100%; /* Maintain a 1:1 aspect ratio for each pixel */
   background-color: #FFFFFF;
-  border: 1px solid #CCCCCC; /* Add border for grid lines */
+  border: 1px solid #CCCCCC;
 }
 
 /* Add styles for hover or other interactions if needed */

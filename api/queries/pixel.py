@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ValidationError, validator
-from typing import Optional, List
+from typing import List
 from datetime import datetime
 from fastapi import HTTPException
 from queries.pool import pool
@@ -157,6 +157,46 @@ class PixelArtQueries:
         except Exception as e:
             print(f"Error in get_pixel_art_by_size: {e}")
             raise HTTPException(status_code=500, detail="Failed to retrieve by size")
+
+    def get_pixel_art_by_id(self, art_id: int) -> PixelArtOut:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as db:
+                    db.execute(
+                        """
+                        SELECT
+                            art_id,
+                            account_id,
+                            pixel_data,
+                            name,
+                            size,
+                            creation_date
+                        FROM pixel_art
+                        WHERE art_id = %s
+                        """,
+                        [art_id],
+                    )
+                    record = db.fetchone()
+                    if record:
+                        pixel_data_str = json.dumps(record[2])  # Convert the list to a JSON-formatted string
+                        pixel_data = json.loads(pixel_data_str) if pixel_data_str else []
+
+                        pixel_art_out = PixelArtOut(
+                            art_id=record[0],
+                            account_id=record[1],
+                            pixel_data=pixel_data,
+                            name=record[3],
+                            size=record[4],
+                            creation_date=record[5]
+                        )
+                        return pixel_art_out
+                    else:
+                        raise HTTPException(
+                            status_code=404, detail="Pixel art not found"
+                        )
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=500, detail=str(e))
 
 
     def delete_pixel_art(self, art_id: int) -> bool:

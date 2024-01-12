@@ -7,3 +7,6 @@
 
 1/9/2024:
     today i fleshed out saving pixel_data into the database, we have a 2d list list of strings saved to the database. From there i implemented a get all art, based on the selected size on the front end. the working one right now is 16x16 any other display cuts it and frams it as if it was 16x unlimited which ill get to imlpementing later. but we have a way to save and store the color data and re render it back on the front end, with any color style hex,rgba,hsla etc.
+
+1/11/2024:
+    today i created a individal view page for each art render the 16,32, and 64, they render respectivly to their size now, when before for example 32 would be rendered hte same as 16 due to the css. so we incorporated checks to check on the size and it will get rendered with a custom css depending on the pixel size. As well added a hover effect on the individual art page so users can see what color values were used per square. Lastly fleshed out the delete function just on PixelArt.js

@@ -22,6 +22,10 @@ def get_all_pixel_art(queries: PixelArtQueries = Depends()):
 def get_pixel_art_by_size(size: str, queries: PixelArtQueries = Depends()):
     return queries.get_pixel_art_by_size(size)
 
+@router.get("/api/pixel_art/{art_id}", response_model=PixelArtOut)
+def get_pixel_art_by_id(art_id: int, queries: PixelArtQueries = Depends()):
+    return queries.get_pixel_art_by_id(art_id)
+
 @router.delete("/api/pixel_art/{art_id}", response_model=dict)
 def delete_pixel_art(art_id: int, queries: PixelArtQueries = Depends()):
     success = queries.delete_pixel_art(art_id)

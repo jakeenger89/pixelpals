@@ -6,6 +6,7 @@ import SignUpForm from "./SignUpForm";
 import LoginForm from "./LoginForm";
 import CreatePixelArt from "./CreatePixelArt";
 import PixelArtGallery from "./PixelArtGallery";
+import PixelArt from "./PixelArt";
 import "./App.css";
 import Nav from "./Nav";
 
@@ -43,6 +44,7 @@ function App() {
           />
           <Route path="account/:account_id" element={<Account />} />
           <Route path="/pixelartgallery" element={<PixelArtGallery />} />
+           <Route path="/pixelart/:art_id" element={<PixelArt />} />
           <Route
             index
             path="account/*"

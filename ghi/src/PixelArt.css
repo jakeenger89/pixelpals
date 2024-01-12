@@ -1,0 +1,44 @@
+.pixel-grid {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 2px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.pixel-grid-32 {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 2px;
+  max-width: 800px;
+  margin: 10px auto;
+}
+
+.pixel-grid-64 {
+  display: grid;
+  gap: 2px;
+  grid-template-columns: repeat(64, 1fr);
+  max-width: 800px;
+  margin: 10px auto;
+}
+
+.pixel-grid-64 .pixel-row {
+  display: grid;
+}
+
+.pixel {
+  width: 100%;
+  flex: 1; /* Ensures each pixel takes up equal space in the row */
+  padding-bottom: 100%; /* Maintains a square aspect ratio */
+  background-color: #FFFFFF;
+  border: 0.1px solid rgba(204, 204, 204, 0.1);
+}
+
+.pixel:hover {
+  background-color: #000000;
+}
+
+.pixel-art-details {
+  text-align: center;
+  margin-top: 10px;
+}

@@ -159,7 +159,7 @@ const CreatePixelArt = () => {
             {row.map((color, colIndex) => (
               <div
                 key={colIndex}
-                className="pixel"
+                className="pixels"
                 style={{ backgroundColor: color }}
                 onMouseEnter={() => handleColorChange(rowIndex, colIndex)}
                 onClick={() => handlePixelClick(rowIndex, colIndex)}
