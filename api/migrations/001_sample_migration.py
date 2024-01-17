@@ -32,4 +32,16 @@ steps = [
         DROP TABLE IF EXISTS pixel_art;
         """
     ],
+    [
+        """
+        CREATE TABLE liked_art (
+        account_id INTEGER REFERENCES account(account_id) ON DELETE CASCADE,
+        art_id INTEGER REFERENCES pixel_art(art_id),
+        PRIMARY KEY (account_id, art_id)
+        );
+        """,
+        """
+        DROP TABLE liked_art;
+        """
+    ],
 ]

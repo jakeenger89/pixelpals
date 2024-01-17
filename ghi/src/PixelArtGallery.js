@@ -5,9 +5,10 @@ import './PixelArtGallery.css'; // Update the CSS import
 const NewPixelArtGallery = () => {
   const [selectedSize, setSelectedSize] = useState('16x16');
   const [pixelArt, setPixelArt] = useState([]);
+  const [account_id, setAccountId] = useState(null);
+  const [likes, setLikes] = useState({});
 
   useEffect(() => {
-    // Fetch pixel art based on the selected size
     const fetchPixelArt = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/pixel_art?size=${selectedSize}`);
@@ -22,8 +23,32 @@ const NewPixelArtGallery = () => {
       }
     };
 
+    const fetchLikes = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/likes');
+        if (response.ok) {
+          const likesData = await response.json();
+          setLikes(likesData);
+        } else {
+          console.error('Error fetching likes:', response);
+        }
+      } catch (error) {
+        console.error('Error fetching likes:', error);
+      }
+    };
+
     fetchPixelArt();
+    fetchLikes();  // Add this line to fetch likes data
   }, [selectedSize]);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('yourAuthToken');
+    if (storedToken) {
+      const decodedToken = JSON.parse(atob(storedToken.split('.')[1]));
+      const { account: { account_id } } = decodedToken;
+      setAccountId(account_id);
+    }
+  }, []);
 
   const getUsername = async (account_id) => {
     try {
@@ -41,47 +66,108 @@ const NewPixelArtGallery = () => {
     }
   };
 
-const renderPixelGrid = (pixelData) => {
-  // Filter pixel art based on the selected size
-  const filteredPixelArt = pixelData.filter((art) => art.size === selectedSize);
-  // set the grid size and shape depending on selected size
-  let gridClassName;
+  const handleLike = async (artId) => {
+    try {
+      if (!account_id) {
+        console.error('User not authenticated');
+        return;
+      }
 
-  if (selectedSize === '32x32') {
-    gridClassName = 'new-pixel-grid-32';
-  } else if (selectedSize === '64x64') {
-    gridClassName = 'new-pixel-grid-64';
-  } else {
-    gridClassName = 'new-pixel-grid';
-  }
+      const response = await fetch(`http://localhost:8000/api/art/${artId}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          account_id: account_id,
+          art_id: artId,
+        }),
+      });
 
-  return (
-    <div className="new-pixel-art-gallery">
-      {filteredPixelArt.map((art) => (
-        <div key={art.art_id} className="new-pixel-art-item">
-          <Link to={`/pixelart/${art.art_id}`}>
-            <h3>{art.name}</h3>
-          </Link>
-          <p>Creation Date: {new Date(art.creation_date).toLocaleDateString()}</p>
-          <div className={gridClassName}>
-            {art.pixel_data.map((row, rowIndex) => (
-              <div key={rowIndex} className="new-pixel-row">
-                {row.map((color, colIndex) => (
-                  <div
-                    key={colIndex}
-                    className="new-pixel"
-                    style={{ backgroundColor: color || '#FFFFFF' }}
-                  ></div>
-                ))}
-              </div>
-            ))}
+      if (response.ok) {
+        setLikes((prevLikes) => ({ ...prevLikes, [artId]: (prevLikes[artId] || 0) + 1 }));
+      } else {
+        console.error('Failed to like the pixel art');
+      }
+    } catch (error) {
+      console.error('Error liking pixel art:', error);
+    }
+  };
+
+  const handleUnlike = async (artId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/art/${artId}/dislike`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          account_id: account_id,
+          art_id: artId,
+        }),
+      });
+
+      if (response.ok) {
+        setLikes((prevLikes) => ({ ...prevLikes, [artId]: Math.max((prevLikes[artId] || 0) - 1, 0) }));
+      } else {
+        console.error('Failed to unlike the pixel art');
+      }
+    } catch (error) {
+      console.error('Error unliking pixel art:', error);
+    }
+  };
+
+  const renderPixelGrid = (pixelData) => {
+    const filteredPixelArt = pixelData.filter((art) => art.size === selectedSize);
+    let gridClassName;
+
+    if (selectedSize === '32x32') {
+      gridClassName = 'new-pixel-grid-32';
+    } else if (selectedSize === '64x64') {
+      gridClassName = 'new-pixel-grid-64';
+    } else {
+      gridClassName = 'new-pixel-grid';
+    }
+
+    return (
+      <div className="new-pixel-art-gallery">
+        {filteredPixelArt.map((art) => (
+          <div key={art.art_id} className="new-pixel-art-item">
+            <Link to={`/pixelart/${art.art_id}`}>
+              <h3>{art.name}</h3>
+            </Link>
+            <p>Creation Date: {new Date(art.creation_date).toLocaleDateString()}</p>
+            <div className={gridClassName}>
+              {art.pixel_data.map((row, rowIndex) => (
+                <div key={rowIndex} className="new-pixel-row">
+                  {row.map((color, colIndex) => (
+                    <div
+                      key={colIndex}
+                      className="new-pixel"
+                      style={{ backgroundColor: color || '#FFFFFF' }}
+                    ></div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <UsernameFetcher account_id={art.account_id} />
+            {account_id && (
+              <>
+                <button className="btn-like" onClick={() => handleLike(art.art_id)}>
+                  Like
+                </button>
+                <button className="btn-unlike" onClick={() => handleUnlike(art.art_id)}>
+                  Unlike
+                </button>
+                <p>Likes: {likes[art.art_id] || 0}</p>
+              </>
+            )}
           </div>
-          <UsernameFetcher account_id={art.account_id} />
-        </div>
-      ))}
-    </div>
-  );
-};
+        ))}
+      </div>
+    );
+  };
 
   const UsernameFetcher = ({ account_id }) => {
     const [username, setUsername] = useState(null);
