@@ -10,3 +10,6 @@
 
 1/11/2024:
     today i created a individal view page for each art render the 16,32, and 64, they render respectivly to their size now, when before for example 32 would be rendered hte same as 16 due to the css. so we incorporated checks to check on the size and it will get rendered with a custom css depending on the pixel size. As well added a hover effect on the individual art page so users can see what color values were used per square. Lastly fleshed out the delete function just on PixelArt.js
+
+1/15/2024:
+    today we utilized my old table for likes on some form of content, what i did was add table, functions, routers, async function on hte js page to handle the ability for useres to like/unlike pixel art which gets saved in the db, and can be re rendered later to keep track of all user's liked art, all the likes on a certain art, looking up art based on "popularity" likes etc.
