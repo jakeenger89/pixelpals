@@ -40,6 +40,11 @@ def delete_pixel_art(art_id: int, queries: PixelArtQueries = Depends()):
 def get_likes(queries: PixelArtQueries = Depends()):
     return queries.get_likes()
 
+@router.get("/api/likes/check", response_model=dict)
+def check_like_status(account_id: int, art_id: int, queries: PixelArtQueries = Depends()):
+    return queries.check_like_status(account_id, art_id)
+
+
 #like a pixel art
 #auth required
 @router.post("/api/art/{art_id}/like", response_model=bool)

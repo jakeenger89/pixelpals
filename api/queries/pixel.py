@@ -5,13 +5,15 @@ from fastapi import HTTPException
 from queries.pool import pool
 import json
 
+
 class Like(BaseModel):
     account_id: int
     art_id: int
 
+
 class PixelArtIn(BaseModel):
     account_id: int
-    pixel_data: List[List[str]]  # Change the type to List[List[str]]
+    pixel_data: List[List[str]]
     name: str
     size: str  # '16x16', '32x32', '64x64'
 
@@ -30,7 +32,7 @@ class PixelArtIn(BaseModel):
 class PixelArtOut(BaseModel):
     art_id: int
     account_id: int
-    pixel_data: List[List[str]]  # Use List[List[str]] to store color codes as strings
+    pixel_data: List[List[str]]
     name: str
     size: str
     creation_date: datetime
@@ -99,7 +101,7 @@ class PixelArtQueries:
                         for record in query_result:
                             print(f"Raw Record: {record}")
 
-                            pixel_data_str = json.dumps(record[2])  # Convert the list to a JSON-formatted string
+                            pixel_data_str = json.dumps(record[2])
                             print(f"Pixel Data String: {pixel_data_str}")
 
                             pixel_data = json.loads(pixel_data_str) if pixel_data_str else []
@@ -181,7 +183,7 @@ class PixelArtQueries:
                     )
                     record = db.fetchone()
                     if record:
-                        pixel_data_str = json.dumps(record[2])  # Convert the list to a JSON-formatted string
+                        pixel_data_str = json.dumps(record[2])
                         pixel_data = json.loads(pixel_data_str) if pixel_data_str else []
 
                         pixel_art_out = PixelArtOut(
@@ -223,11 +225,11 @@ class PixelArtQueries:
             with conn.cursor() as cur:
                 try:
                     print(f"Attempting to like art_id {art_id} for account_id {account_id}")
-                    # Check if the user already liked the song
+                    # Check if the user already liked the art
                     if self.is_art_liked_by_user(art_id, account_id):
-                        return False  # User already liked the song
+                        return False  # User already liked the art
 
-                    # Like a song
+                    # Like a art
                     cur.execute(
                         """
                         INSERT INTO liked_art (account_id, art_id)
@@ -259,7 +261,7 @@ class PixelArtQueries:
         with pool.connection() as conn:
             with conn.cursor() as cur:
                 try:
-                    # Unlike a song
+                    # Unlike art
                     cur.execute(
                         """
                         DELETE FROM liked_art
@@ -308,7 +310,7 @@ class PixelArtQueries:
                     raise HTTPException(
                         status_code=500, detail="Error retrieving liked art"
                     )
-
+    # display for total likes per art
     def get_likes(self) -> Dict[int, int]:
         try:
             with pool.connection() as conn:
@@ -325,3 +327,23 @@ class PixelArtQueries:
         except Exception as e:
             print(f"Error in get_likes: {e}")
             raise
+
+    def check_like_status(self, account_id: int, art_id: int) -> Dict[str, bool]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as db:
+                    db.execute(
+                        """
+                        SELECT EXISTS (
+                            SELECT 1
+                            FROM liked_art
+                            WHERE account_id = %s AND art_id = %s
+                        ) AS has_liked
+                        """,
+                        (account_id, art_id)
+                    )
+                    result = db.fetchone()
+                    return {"hasLiked": result[0]}
+        except Exception as e:
+            print(f"Error in check_like_status: {e}")
+            raise HTTPException(status_code=500, detail="Failed to check like status")

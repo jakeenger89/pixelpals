@@ -36,7 +36,7 @@ steps = [
         """
         CREATE TABLE liked_art (
         account_id INTEGER REFERENCES account(account_id) ON DELETE CASCADE,
-        art_id INTEGER REFERENCES pixel_art(art_id),
+        art_id INTEGER REFERENCES pixel_art(art_id) ON DELETE CASCADE,
         PRIMARY KEY (account_id, art_id)
         );
         """,
