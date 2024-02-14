@@ -42,3 +42,18 @@
   text-align: center;
   margin-top: 10px;
 }
+
+.pixel-grid-container {
+  text-align: center;
+}
+
+.like-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px; /* Adjust as needed */
+}
+
+.like-container p {
+  margin-right: 250px; /* Adjust as needed */
+}

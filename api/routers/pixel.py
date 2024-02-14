@@ -67,6 +67,25 @@ def unlike_art(
     queries.unlike_art(art_id, like.account_id)
     return True
 
+@router.get("/api/userart/{account_id}", response_model=List[PixelArtOut])
+def get_user_art_by_account(account_id: int, queries: PixelArtQueries = Depends()):
+    """
+    Fetch all pixel art created by the specified account.
+    """
+    try:
+        print(f"Attempting to fetch user art for account ID: {account_id}")
+        user_art = queries.get_user_art_by_account_id(account_id)
+        if user_art:
+            print(f"User art fetched successfully: {user_art}")
+            return user_art
+        else:
+            print("User art not found.")
+            raise HTTPException(status_code=404, detail="User art not found")
+    except Exception as e:
+        print(f"Error fetching user art for account ID {account_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # # get all liked art from an account
 # # authentication required
 # @router.get(

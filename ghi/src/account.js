@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 const Account = ({ isAuthenticated, setIsAuthenticated }) => {
   const navigate = useNavigate();
@@ -72,12 +73,15 @@ const Account = ({ isAuthenticated, setIsAuthenticated }) => {
         </button>
       </div>
 
-      <div className="offset-3 col-6" style={{ marginLeft: '-10px' }}>
-        <div className="shadow p-4 mt-4">
-          <div className="welcome-link">
-            {/* Display welcome message with the username */}
-            <h1>Welcome {currentUser.username}, to Pixel Pals!</h1>
-            <hr className="full-width-line" />
+      {/* Navigation Link to Pixel Art Gallery */}
+      <div className="row">
+        <div className="offset-8 col-4">
+          <div className="shadow p-4 mt-4">
+            <div className="welcome-link">
+              <h1>Welcome {currentUser.username}, to Pixel Pals!</h1>
+              <hr className="full-width-line" />
+              <Link to="/accountart">{currentUser.username}'s Pixel Art Gallery</Link>
+            </div>
           </div>
         </div>
       </div>

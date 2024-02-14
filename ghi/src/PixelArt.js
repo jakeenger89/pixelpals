@@ -8,6 +8,8 @@ const PixelArt = () => {
   const [username, setUsername] = useState(null);
   const [hoverColor, setHoverColor] = useState(null);
   const [isLoggedInUser, setIsLoggedInUser] = useState(false);
+  const [likes, setLikes] = useState(null);
+  const [likeStatus, setLikeStatus] = useState(null);
 
   useEffect(() => {
     const fetchPixelArt = async () => {
@@ -17,38 +19,22 @@ const PixelArt = () => {
           const data = await response.json();
           setPixelArt(data);
 
-          // Fetch and set the username separately
           const userResponse = await fetch(`http://localhost:8000/api/account/${data.account_id}`);
           if (userResponse.ok) {
             const userData = await userResponse.json();
             setUsername(userData.username);
 
-            // Check if the current user is the owner of the pixel art
             const storedToken = localStorage.getItem("yourAuthToken");
-            console.log("Stored Token:", storedToken);
             const userIsLoggedIn = Boolean(storedToken);
 
             if (storedToken) {
-                const decodedToken = atob(storedToken.split('.')[1]); // Decode the token
-                const parsedToken = JSON.parse(decodedToken);
-                console.log("Decoded Token:", parsedToken);
+              const decodedToken = atob(storedToken.split('.')[1]);
+              const parsedToken = JSON.parse(decodedToken);
             }
 
-            console.log("User is logged in:", userIsLoggedIn);
-            console.log("Pixel art owner ID:", data.account_id);
-
-            // Log the entire userData object
-            console.log("User Data:", userData);
-
-            // Check if userData has the 'id' property
             if ('account_id' in userData) {
-              console.log("Logged-in user ID:", userData.account_id);
-
               if (userIsLoggedIn && userData.account_id === data.account_id) {
                 setIsLoggedInUser(true);
-                console.log("User is the owner of the pixel art");
-              } else {
-                console.log("User is NOT the owner of the pixel art");
               }
             } else {
               console.error("User Data does not contain 'id' property");
@@ -67,6 +53,120 @@ const PixelArt = () => {
     fetchPixelArt();
   }, [art_id]);
 
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/likes');
+        if (response.ok) {
+          const likesData = await response.json();
+          setLikes(likesData[art_id] || 0);
+        } else {
+          console.error('Error fetching likes:', response);
+        }
+      } catch (error) {
+        console.error('Error fetching likes:', error);
+      }
+    };
+
+    fetchLikes();
+  }, [art_id]);
+
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      try {
+        const storedToken = localStorage.getItem("yourAuthToken");
+        if (storedToken) {
+          const decodedToken = atob(storedToken.split('.')[1]);
+          const parsedToken = JSON.parse(decodedToken);
+          const account_id = parsedToken.account.account_id;
+          const response = await fetch(`http://localhost:8000/api/likes/check?account_id=${account_id}&art_id=${art_id}`);
+          if (response.ok) {
+            const likeStatusData = await response.json();
+            setLikeStatus(likeStatusData.hasLiked);
+          } else {
+            console.error('Error fetching like status:', response);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching like status:', error);
+      }
+    };
+
+    fetchLikeStatus();
+  }, [art_id]);
+
+  const handleLike = async () => {
+    try {
+      const storedToken = localStorage.getItem("yourAuthToken");
+      if (storedToken) {
+        const decodedToken = atob(storedToken.split('.')[1]);
+        const parsedToken = JSON.parse(decodedToken);
+        const account_id = parsedToken.account.account_id;
+        const response = await fetch(`http://localhost:8000/api/art/${art_id}/like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            account_id: account_id,
+            art_id: art_id,
+          }),
+        });
+
+        if (response.ok) {
+          setLikes((prevLikes) => prevLikes + 1);
+          setLikeStatus(true);
+        } else {
+          console.error('Failed to like the pixel art');
+        }
+      }
+    } catch (error) {
+      console.error('Error liking pixel art:', error);
+    }
+  };
+
+  const handleUnlike = async () => {
+    try {
+      const storedToken = localStorage.getItem("yourAuthToken");
+      if (storedToken) {
+        const decodedToken = atob(storedToken.split('.')[1]);
+        const parsedToken = JSON.parse(decodedToken);
+        const account_id = parsedToken.account.account_id;
+        const response = await fetch(`http://localhost:8000/api/art/${art_id}/dislike`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            account_id: account_id,
+            art_id: art_id,
+          }),
+        });
+
+        if (response.ok) {
+          setLikes((prevLikes) => Math.max(prevLikes - 1, 0));
+          setLikeStatus(false);
+        } else {
+          console.error('Failed to unlike the pixel art');
+        }
+      }
+    } catch (error) {
+      console.error('Error unliking pixel art:', error);
+    }
+  };
+
+  const renderLikeButton = () => {
+    if (likeStatus === null) {
+      return null;
+    }
+    if (likeStatus) {
+      return <button className="btn-unlike" onClick={handleUnlike}>Unlike</button>;
+    } else {
+      return <button className="btn-like" onClick={handleLike}>Like</button>;
+    }
+  };
+
   const handlePixelHover = (color) => {
     setHoverColor(color);
   };
@@ -82,10 +182,9 @@ const PixelArt = () => {
       });
 
       if (response.ok) {
-        // Optionally, you can handle success, e.g., redirect to another page or show a message
         console.log('Pixel art deleted successfully');
+        window.location.href = '/accountart';
       } else {
-        // Handle the case where the deletion was not successful
         console.error('Failed to delete pixel art:', response);
       }
     } catch (error) {
@@ -94,7 +193,9 @@ const PixelArt = () => {
   };
 
   const renderPixelGrid = () => {
-    // Determine the grid size based on the selected size
+    if (!pixelArt) {
+      return null;
+    }
     const gridSize = pixelArt.size === '32x32' ? 'pixel-grid-32' : pixelArt.size === '64x64' ? 'pixel-grid-64' : 'pixel-grid';
 
     return (
@@ -116,18 +217,18 @@ const PixelArt = () => {
     );
   };
 
-  if (!pixelArt) {
-    return <p>Loading...</p>;
-  }
-
   return (
     <div>
-      <h2 className="pixel-art-details">{pixelArt.name}</h2>
-      <p className="pixel-art-details">Creation Date: {new Date(pixelArt.creation_date).toLocaleDateString()}</p>
-      <div className="">
+      <h2 className="pixel-art-details">{pixelArt ? pixelArt.name : 'Loading...'}</h2>
+      <p className="pixel-art-details">Creation Date: {pixelArt ? new Date(pixelArt.creation_date).toLocaleDateString() : ''}</p>
+      <div className="pixel-grid-container">
         {renderPixelGrid()}
       </div>
-      <p className="pixel-art-details">Created by: {username}</p>
+      <div className="like-container">
+        <p className="pixel-art-details">Created by: {username}</p>
+        {renderLikeButton()}
+      </div>
+      <p className="pixel-art-details">Total Likes: {likes}</p>
       {isLoggedInUser && (
         <button onClick={handleDelete}>Delete Art</button>
       )}

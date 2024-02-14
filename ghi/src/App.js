@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 // import AuthenticatedRoute from "./authentication";
 import Account from "./account";
+import AccountArt from "./accountart";
 import SignUpForm from "./SignUpForm";
 import LoginForm from "./LoginForm";
 import CreatePixelArt from "./CreatePixelArt";
@@ -45,6 +46,7 @@ function App() {
           <Route path="account/:account_id" element={<Account />} />
           <Route path="/pixelartgallery" element={<PixelArtGallery />} />
            <Route path="/pixelart/:art_id" element={<PixelArt />} />
+           <Route path="/accountart" element={<AccountArt />} />
           <Route
             index
             path="account/*"

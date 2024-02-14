@@ -1,9 +1,10 @@
 from pydantic import BaseModel, ValidationError, validator
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime
 from fastapi import HTTPException
 from queries.pool import pool
 import json
+import logging
 
 
 class Like(BaseModel):
@@ -128,6 +129,43 @@ class PixelArtQueries:
             # Print the exception message and traceback
             print(f"Error in get_all_pixel_art: {e}")
             raise HTTPException(status_code=500, detail="Failed to retrieve all pixel art")
+
+    def get_user_art_by_account_id(self, account_id: int) -> Optional[List[PixelArtOut]]:
+        """
+        Fetch user art based on account_id.
+        """
+        try:
+            with pool.connection() as connection:  # Assuming pool is your database connection pool
+                with connection.cursor() as cur:
+                    cur.execute(
+                        """
+                        SELECT art_id, account_id, pixel_data, name, size, creation_date
+                        FROM pixel_art
+                        WHERE account_id = %s
+                        """,
+                        (account_id,),
+                    )
+                    rows = cur.fetchall()
+
+                    if rows:
+                        user_art = []
+                        for row in rows:
+                            art_id, account_id, pixel_data, name, size, creation_date = row
+                            if isinstance(pixel_data, str):
+                                pixel_data = json.loads(pixel_data)  # Parse if it's a string
+                            user_art.append(PixelArtOut(
+                                art_id=art_id,
+                                account_id=account_id,
+                                pixel_data=pixel_data if pixel_data else [],
+                                name=name,
+                                size=size,
+                                creation_date=creation_date
+                            ))
+                        return user_art
+                    else:
+                        return None
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
     def get_pixel_art_by_size(self, size: str) -> List[PixelArtOut]:
         try:

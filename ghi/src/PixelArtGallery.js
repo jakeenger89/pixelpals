@@ -134,6 +134,8 @@ const NewPixelArtGallery = () => {
     }
   };
 
+
+
   const renderPixelGrid = () => {
     const gridClassName = `new-pixel-grid${selectedSize === '32x32' ? '-32' : selectedSize === '64x64' ? '-64' : ''}`;
 
